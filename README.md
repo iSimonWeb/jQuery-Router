@@ -9,7 +9,7 @@ Simple cofiguration
 ```javascript
 function($) {
 	$(document).ready(function() {
-		var mySiteRouter = new $.Router();
+		var mySiteRouter = new $.Router(args);
 	});
 })(jQuery);
 ```
