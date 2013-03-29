@@ -62,5 +62,32 @@ Parameters explaination
 	contentWrap: '',
 ```
 
+```javascript
+	// Text to put between your site's title and the current route name
+	// BOOBS: site title is automatically retrieved from <title /> in your index file
+	// BOOBS: route names are also automatically retrieved, this time from main menu anchor's text
+	titleSeparator: '|',
+```
+
+```javascript
+	// CSS Selector of your site's main menu
+	mainMenu: '#main-menu',
+	// Items of your main menu,
+	// ".active" class will be added when selcted
+	// BOOBS: in case of a simpler <nav><a /></nav> menu set this parameter to '' (empty string)
+	menuItemsSelector: 'li',
+	// Anchors of your main menu,
+	// the router will collect several information from them storing them in a JSON
+	// e.g.
+	//	routes[routeName] = {										// "routeName" is the "href" attribute of menuAnchor
+	//		elem: $item,											// menuItem jQuery obj 
+	//		title: $item.text(),									// menuItem text
+	//		url: routeName + '.php',								// same as above
+	//		scrollAxis: $this.data('scroll-axis') || 'y',			// data-scroll-axis attribute of menuAnchor
+	//		pageSetup: settings.setupFunctions[routeName] || null	// per page setup, continue reading to discover it
+	//	}
+	menuAnchorsSelector: 'a',
+```
+
 TO BE CONTINUED...
 =============
