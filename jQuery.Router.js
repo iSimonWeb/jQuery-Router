@@ -4,7 +4,6 @@
 *	@author: Laser Design Studio
 */
 (function($) {
-	
 	jQuery.Router = function(options) {
 		var router = {};
 		var settings = $.extend({
