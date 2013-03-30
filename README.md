@@ -77,7 +77,7 @@ Parameters explaination
 	// BOOBS: in case of a simpler <nav><a /></nav> menu set this parameter to '' (empty string)
 	menuItemsSelector: 'li',
 	// Anchors of your main menu,
-	// the router will collect several information from them storing them in a JSON
+	// the router will collect several information from them
 	// e.g.
 	//	routes[routeName] = {										// "routeName" is the "href" attribute of menuAnchor
 	//		elem: $item,											// menuItem jQuery obj 
