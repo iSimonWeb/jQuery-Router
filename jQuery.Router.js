@@ -16,45 +16,88 @@
 				menuItemsSelector: 'li',
 				menuAnchorsSelector: 'a',
 				homeAsReset: false,
-				parametersName: {},
 				setupFunctions: {},
 				onUnload: function() {},
 				onLoad: function() {}
 			}, options);
-		var routes = {};
-		var root = $('base').eq(0).attr('href') || '/';
-		var siteTitle = document.title;
-		// Elements cache
+		
+		// Main vars =======================================================================
+		var routes = {},
+			root = $('base').eq(0).attr('href') || '/',
+			rootRegExp = new RegExp('^' + root),
+			siteTitle = document.title;
+		
+		// Elements cache ==================================================================
 		var $targetContainer = $(settings.target);
 		var $mainMenuAnchors = $(settings.mainMenu + ' ' + settings.menuAnchorsSelector);
 		var $mainMenuItems = (settings.menuItemsSelector == '')
 			? $mainMenuAnchors
 			: $(settings.mainMenu + ' ' + settings.menuItemsSelector);
 		
+		// Utility functions ===============================================================
+		// @returns current pathname w/o root
+		var getPathname = function() {
+			return document.location.pathname.replace(rootRegExp, '');
+		};
+		
 		// Setup HTML5 history funcitonality and plan routes
-		$mainMenuAnchors
+		$mainMenuItems
 			.each(function(index) {
 				var $this = $(this),
-					$item = (settings.menuItemsSelector == '') ? $this : $this.children(settings.menuItemsSelector),
-					routeName = $this.attr('href').replace(root, '') || 'home';
+					$anchor = (settings.menuItemsSelector == '')
+						? $this
+						: $this.find(settings.menuAnchorsSelector),
+					routeName = $anchor.attr('href').replace(rootRegExp, '') || 'home',
+					routePage = routeName + '.php',
+				// Route params vars
+					urlStructure = $anchor.data('url-structure'),
+					paramRegExp = /:(\w+)/g,
+					routePageRegExp = /\/:\w+/g,
+					routeParams = {};
 				
 				// Attach click event on mainmenu links
-				$this.click(function(e) {
+				$anchor.click(function(e) {
 					e.preventDefault();
-					//if ($item.hasClass('active')) return false;
-					if ($this.attr('href') == document.location.pathname.replace(root, ''))
+					
+					// if same path, do nothing
+					if ($anchor.attr('href') == getPathname())
 						return false;
-					// Push anchor state
-					history.pushState({'route': routeName}, '', $this.attr('href'));
+					
+					// else push anchor href
+					history.pushState({'route': routeName}, '', $anchor.attr('href'));
 					router.load();
 				});
 				
+				// if parametrized url
+				if (urlStructure) {
+					// Get paramValues fom anchor href
+					// using urlStructure from data-url-structure attribute
+					var routeRegExp = urlStructure.replace(paramRegExp, '([^\/]+)');
+					routeRegExp = new RegExp('^' + routeRegExp + '$');
+					var paramValues = routeRegExp.exec($anchor.attr('href')).slice(1);
+					
+					// Get paramKeys from urlStructure
+					var urlStructureRegExp = urlStructure.replace(paramRegExp, ':([^\/]+)');
+					urlStructureRegExp = new RegExp('^' + urlStructureRegExp + '$');
+					var paramKeys = urlStructureRegExp.exec(urlStructure).slice(1);
+					
+					// Combine 'em in an object
+					$.each(paramKeys, function(index, key) {
+						routeParams[key] = paramValues[index] || 0;
+					});
+					
+					// Change routePage
+					routePage = urlStructure.replace(routePageRegExp, '').substr(1) + '.php';
+				}
+					
 				// Write route info
 				routes[routeName] = {
-					elem: $item,
-					title: $item.text(),
-					url: routeName + '.php',
-					scrollAxis: $this.data('scroll-axis') || 'y',
+					elem: $this,
+					title: $this.text(),
+					href: $anchor.attr('href'),
+					pageUrl: routePage,
+					params: routeParams,
+					scrollAxis: $anchor.data('scroll-axis') || 'y',
 					pageSetup: settings.setupFunctions[routeName] || null
 				};
 			});
@@ -66,23 +109,23 @@
 		
 		// Page loader
 		router.load = function() {
-			var currentPath = document.location.pathname.replace(root, ''),
-				route = routes[currentPath];
+			var route = routes[getPathname()];
 			
-			if (route !== undefined) {
-				var pathNames = document.location.pathname.replace(root, '').split('/'),
-					parametersName = settings.parametersName[currentPath],
-					postData = {};
-			} else {
-				var pathNames = document.location.pathname.replace(root, '').split('/'),
+			// Check if pathname match w/ one of the routes
+			// e.g. '/tours/disneyland'
+			if (route !== undefined)
+				var pathNames = getPathname().split('/');
+			else {
+			// If not, try to get only the first pathname
+			// e.g. 'tours'
+				var pathNames = getPathname().split('/'),
 					currentPath = pathNames[0] || 'home',
-					route = routes[currentPath],
-					parametersName = settings.parametersName[currentPath],
-					postData = {};
+					route = routes[currentPath];
 			}
-			
-			// Check if route exist, else "redirect" to home
+			// If route still do not exist redirect to 'home' route
+			// e.g. there's no routes['tours']
 			if (route === undefined) {
+				console.log('jQuery Router: no way to get it, returning to home.');
 				history.pushState({'route': 'home'}, '', root);
 				router.load();
 				return false;
@@ -91,6 +134,7 @@
 			// Manage .active menu-item
 			$mainMenuItems.removeClass('active');
 			route.elem.addClass('active');
+			
 			// Manage title
 			if (settings.homeAsReset && currentPath == 'home')
 				document.title = siteTitle;
@@ -103,15 +147,6 @@
 				return false;
 			}
 			
-			// Build post data object (if needed)
-			if (pathNames.slice(1).length)
-				$.each(pathNames.slice(1), function(index, parameter) {
-					if (parametersName === undefined || parametersName[index] === undefined)
-						var key = index + '';
-					else var key = parametersName[index];
-					postData[key] = pathNames[index +1];
-				});
-			
 			// Set loading state
 			$targetContainer.addClass('loading');
 			
@@ -123,8 +158,8 @@
 			if ($.isFunction(unloadFunctionResponse.promise))
 				unloadFunctionResponse.done(function() {
 					$.post(
-						root + settings.pageFolder + route.url,
-						postData,		// Pass to the script other pathNames as argument
+						root + settings.pageFolder + route.pageUrl,
+						route.params,		// Pass to the script other pathNames as argument
 						function(responseText) {
 							// Remove loading state
 							$targetContainer.removeClass('loading');
@@ -152,8 +187,8 @@
 			// Else load requested page w/o waiting
 			else
 				$.post(
-					root + settings.pageFolder + route.url,
-					postData,		// Pass to the script other pathNames as argument
+					root + settings.pageFolder + route.pageUrl,
+					route.params,		// Pass to the script other pathNames as argument
 					function(responseText) {
 						// Remove loading state
 						$targetContainer.removeClass('loading');
@@ -184,6 +219,4 @@
 		
 		return router;
 	};
-	
-	
 })(jQuery);
