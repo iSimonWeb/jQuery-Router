@@ -36,7 +36,7 @@ These are the defaults:
 }
 ```
 
-Parameters explaination
+Options explaination
 =============
 
 ```javascript
