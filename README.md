@@ -4,7 +4,7 @@ jQuery-Router
 The easiest way to setup an AJAX + History API navigation style on your site.
 You just need a main menu in order to make the script understand the main routes of your site.
 
-Simple cofiguration
+Simple configuration
 =============
 ```javascript
 function($) {
@@ -14,7 +14,7 @@ function($) {
 })(jQuery);
 ```
 
-Parameters
+Options
 =============
 
 As it always is, you can pass an object to the constructor to customize your router instance.
