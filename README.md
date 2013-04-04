@@ -30,7 +30,6 @@ These are the defaults:
 	menuItemsSelector: 'li',
 	menuAnchorsSelector: 'a',
 	homeAsReset: false,
-	parametersName: {},
 	setupFunctions: {},
 	onUnload: function() {},
 	onLoad: function() {}
