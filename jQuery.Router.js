@@ -60,7 +60,7 @@
 					e.preventDefault();
 					
 					// if same path, do nothing
-					if ($anchor.attr('href') == getPathname())
+					if ($anchor.attr('href') == '/' + getPathname())
 						return false;
 					
 					// else push anchor href
@@ -87,7 +87,7 @@
 					});
 					
 					// Change routePage
-					routePage = urlStructure.replace(routePageRegExp, '').substr(1) + '.php';
+					routePage = urlStructure.replace(routePageRegExp, '') + '.php';
 				}
 					
 				// Write route info
@@ -125,7 +125,6 @@
 			// If route still do not exist redirect to 'home' route
 			// e.g. there's no routes['tours']
 			if (route === undefined) {
-				console.log('jQuery Router: no way to get it, returning to home.');
 				history.pushState({'route': 'home'}, '', root);
 				router.load();
 				return false;
