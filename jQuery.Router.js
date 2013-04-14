@@ -97,7 +97,7 @@
 						? $this
 						: $this.find(settings.menuAnchorsSelector),
 					routeName = $anchor.attr('href').replace(rootRegExp, '') || 'home',
-					routePage = routeName + '.php';
+					routePage = routeName + '.php',
 				// Route params vars
 					urlStructure = $anchor.data('url-structure'),
 					//paramRegExp = /:(\w+)/g,
@@ -136,8 +136,8 @@
 				
 				// Write route info
 				routes[routeName] = {
-					elem: $this,
-					title: $this.text(),
+					//elem: $this,
+					//title: $this.text(),
 					regExp: routeRegExp,
 					pageUrl: routePage,
 					paramList: routeParams,
