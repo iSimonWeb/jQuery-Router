@@ -4,6 +4,32 @@ jQuery-Router
 The easiest way to setup an AJAX + History API navigation style on your site.
 You just need a main menu in order to make the script understand the main routes of your site.
 
+Simple setup
+=============
+```html
+<body>
+	<section id="shell">
+		<nav id="main">
+			<h1 id="icon"><a href="/">My fantastic tour agency</a></h1>
+			<a href="/about-us">About Us</a>
+			<div class="submenu-wrap">
+				<a href="/tours" data-url-structure="/tours(/:tourName)">Tours</a>
+				<div class="submenu"></div>
+					<a href="/tours/disneyland">Disneland</a>
+					<a href="/tours/honolulu">Honolulu</a>
+					<a href="/tours/miami-beach">Miami Beach</a>
+				</div>
+			</div>
+			<a href="/contacts">Contacts</a>
+		</nav>
+		<section id="pearl"></section>
+	</section>
+	
+	<script src="/js/jquery-1.9.1.min.js"></script>
+	<script src="/js/jQuery.Router.js"></script>
+</body>
+```
+
 Simple configuration
 =============
 ```javascript
@@ -56,7 +82,8 @@ Options explaination
 	loadTarget: null,
 	// Some HTML code to wrap received data with
 	// Since the plugin use $.wrap() to manage that,
-	// you must follow jQuery .wrap() rule
+	// you must follow jQuery .wrap() rules;
+	// you can also use a function.
 	// e.g. '<div class="wrap" />'
 	contentWrap: '',
 ```
@@ -77,16 +104,45 @@ Options explaination
 	menuItemsSelector: 'li',
 	// Anchors of your main menu,
 	// the router will collect several information from them
-	// e.g.
-	//	routes[routeName] = {										// "routeName" is the "href" attribute of menuAnchor
-	//		elem: $item,											// menuItem jQuery obj 
-	//		title: $item.text(),									// menuItem text
-	//		url: routeName + '.php',								// same as above
-	//		scrollAxis: $this.data('scroll-axis') || 'y',			// data-scroll-axis attribute of menuAnchor
-	//		pageSetup: settings.setupFunctions[routeName] || null	// per page setup, continue reading to discover it
-	//	}
 	menuAnchorsSelector: 'a',
 ```
 
+```javascript
+	// In case your site's home is a reset, set this option to true
+	// so Router won't load an 'home.php' page, but will just remove loaded page
+	// and call 'onUnload' function
+	homeAsReset: false,
+```
+
+```javascript
+	// If a route name matches a function name inside this object,
+	// Router will execute the matched function on page load
+	// e.g. {
+	//			'home': function() {
+	//				console.log('Hell yeah! Home page loaded!');
+	//			}
+	//		}
+	setupFunctions: {},
+	// Each time the user change route (load another site page)
+	// this function will be executed.
+	// Two parameters are passed:
+	// - 'pathName': is the route the user is navigating to (root address is removed);
+	// 		e.g. 'tours' 		[notice that there's no slash]
+	// - 'route': is the route object that the Router build from main-menu
+	// 		e.g. {
+	//			regExp: RegExp /^\/tours(?:\/([^\/]+))?$/,
+	//			pageUrl: 'tours.php',
+	//			paramList: ["tour-name"],
+	//			scrollAxis: 'y',
+	//			pageSetup: function(pathName, route) {
+	//				console.log('Tour page loaded!');
+	//			}
+	//		}
+	// e.g. You may use it to make the 'loadTarget' disappear (opacity: 0)
+	onUnload: function(pathName, route) {},
+	// Same as above, but this one is called on page load
+	onLoad: function() {}
+}
+```
 TO BE CONTINUED...
 =============
