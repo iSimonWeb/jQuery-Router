@@ -6,6 +6,7 @@ You just need a main menu in order to make the script understand the main routes
 
 Simple setup
 =============
+This will be your index file.
 ```html
 <body>
 	<section id="shell">
@@ -28,6 +29,17 @@ Simple setup
 	<script src="/js/jquery-1.9.1.min.js"></script>
 	<script src="/js/jQuery.Router.js"></script>
 </body>
+```
+Add these line to your .htaccess file to make the user able to refresh page, go back in hystory or link page to anyone.
+```
+# html5 pushstate (history) support:
+<ifModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} !index
+    RewriteRule (.*) index.php [L]
+</ifModule>
 ```
 
 Simple configuration
