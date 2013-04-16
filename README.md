@@ -156,5 +156,31 @@ Options explaination
 	onLoad: function() {}
 }
 ```
+
+Dynamic Routes
+=============
+*CARE: you only need to define dynamic routes once!*
+
+As you can see on the HTML example above there's a dynamic route
+```html
+<a href="/tours" data-url-structure="/tours(/:tourName)">Tours</a>
+```
+(/:tourName) is an optional parameter, if present on the URI will be passed to the relative .php page script via POST request as a JSON.
+e.g. if URI would be "/tours/disneyland"
+```javascript
+{
+	"tourName": 'disnayland'
+}
+```
+and you could read it on server-side as you always do
+```php
+$tourName = $_POST['tourName'];
+```
+
+If your route always need a parameter you can setup it with a simple named parameter this way:
+```html
+<a href="/profile/iSimonWeb" data-url-structure="/profile/:userName">Tours</a>
+```
+
 TO BE CONTINUED...
 =============
