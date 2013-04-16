@@ -182,7 +182,6 @@
 				});
 			}
 			
-			//setActiveItem(route.regExp);
 			(function() {
 				// Manage .active menu-item
 				var currentPath = getPathname(true),
@@ -209,7 +208,7 @@
 					document.title = siteTitle;
 				else
 					document.title = siteTitle + ' ' + settings.titleSeparator + ' ' + $targetAnchor.text();
-			});
+			})();
 			
 			// If homeAsReset call onUnload and exit
 			if (settings.homeAsReset && currentPath == 'home') {
@@ -222,7 +221,7 @@
 			
 			// Call onUnload setup function and check response
 			var unloadFunctionResponse = settings.onUnload(currentPath, route) || false;
-			console.log('loading ' + currentPath);
+			
 			// If a deferred obj is returned, wait for its end
 			// and load requested page
 			if ($.isFunction(unloadFunctionResponse.promise))
