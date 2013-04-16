@@ -204,7 +204,7 @@
 					$targetAnchor.parents(settings.menuItemsSelector).addClass('active');
 				
 				// Manage title
-				if (settings.homeAsReset && currentPath == 'home')
+				if (settings.homeAsReset && currentPath == root)
 					document.title = siteTitle;
 				else
 					document.title = siteTitle + ' ' + settings.titleSeparator + ' ' + $targetAnchor.text();
