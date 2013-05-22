@@ -4,46 +4,76 @@
 *	@author: Laser Design Studio
 */
 (function($) {
+	// serializeObject function ========================================================
+	// thanks to Tobias Cohen ==========================================================
+	// http://stackoverflow.com/a/1186309 ==============================================
+	// =================================================================================
+	$.fn.serializeObject = function() {
+		var o = {};
+		var a = this.serializeArray();
+		$.each(a, function() {
+			if (o[this.name] !== undefined) {
+				if (!o[this.name].push) {
+					o[this.name] = [o[this.name]];
+				}
+				o[this.name].push(this.value || '');
+			} else
+				o[this.name] = this.value || '';
+		});
+		return o;
+	};
+	
 	jQuery.Router = function(options) {
 		var router = {};
+		
+		// Plugin's options obj ============================================================
+		// =================================================================================
 		var settings = $.extend({
-				pageFolder: 'pages/',
+				ajaxFolder: '/ajax',
 				target: '#pearl',
 				loadTarget: null,
 				contentWrap: '',
 				titleSeparator: '|',
-				mainMenu: '#main-menu',
+				mainMenu: 'nav#main',
 				menuItemsSelector: 'li',
 				menuAnchorsSelector: 'a',
 				homeAsReset: false,
 				setupFunctions: {},
 				onUnload: function() {},
-				onLoad: function() {}
+				onLoad: function() {},
+				onHashChange: function() {},
+				onFormSubmit: function() {}
 			}, options);
 		
 		// Main vars =======================================================================
+		// =================================================================================
 		var routes = {},
-			root = $('base').eq(0).attr('href') || '/',
-			rootRegExp = new RegExp('^' + root),
-			siteTitle = document.title;
+			siteTitle = document.title,
+			pageFolder = '/pages';
 		
 		// Elements cache ==================================================================
+		// =================================================================================
 		var $targetContainer = $(settings.target);
+		var $loadTarget = (settings.loadTarget == null) ? $targetContainer : $targetContainer.find(settings.loadTarget);
 		var $mainMenuAnchors = $(settings.mainMenu + ' ' + settings.menuAnchorsSelector);
 		var $mainMenuItems = (settings.menuItemsSelector == '')
 			? $mainMenuAnchors
 			: $(settings.mainMenu + ' ' + settings.menuItemsSelector);
 		
 		// Utility functions ===============================================================
-		// @returns current pathname w/ or w/o root
-		var getPathname = function(wRoot) {
-			if (wRoot)
-				return document.location.pathname;
-			else
-				return document.location.pathname.replace(rootRegExp, '');
+		// =================================================================================
+		/**
+		* @returns current pathname w/o hashFragment
+		*/
+		var getPathname = function() {
+			return document.location.pathname.replace(/#.*$/, '');
 		};
+		
+		/**
+		* @param 'routeRegExp': RegExp for matching current route
+		*/
 		var setActiveItem = function(routeRegExp) {
-			var currentPath = getPathname(true),
+			var currentPath = getPathname(),
 				$targetAnchor = $mainMenuAnchors.filter('[href="' + currentPath + '"]');
 			
 			if (!$targetAnchor.length) {
@@ -63,11 +93,10 @@
 				$targetAnchor.parents(settings.menuItemsSelector).addClass('active');
 		};
 		
-		// Cached regular expressions for matching named param parts and splatted
-		// parts of route strings.
+		// Cached regular expressions for matching named param parts
+		// of route strings.
 		var optionalParam = /\((.*?)\)/g;
 		var namedParam    = /(\(\?)?:\w+/g;
-		//var splatParam    = /\*\w+/g;
 		var escapeRegExp  = /[\-{}\[\]+?.,\\\^$|#\s]/g;
 		var routeToRegExp = function(route) {
 			route = route
@@ -75,12 +104,11 @@
 				.replace(optionalParam, '(?:$1)?')
 				.replace(namedParam, function(match, optional){
 					return optional ? match : '([^\/]+)';
-				})
-				//.replace(splatParam, '(.*?)');
+				});
 			return new RegExp('^' + route + '$');
 		};
 		var extractParameters = function(routeRegExp) {
-			var currentPath = getPathname(true);
+			var currentPath = getPathname();
 			return routeRegExp.exec(currentPath).slice(1);
 		};
 		var extractParametersNames = function(urlStructure) {
@@ -96,29 +124,30 @@
 					$anchor = (settings.menuItemsSelector == '')
 						? $this
 						: $this.find(settings.menuAnchorsSelector),
-					routeName = $anchor.attr('href').replace(rootRegExp, '') || 'home',
+					href = $anchor.attr('href'),
+					routeName = (href != '/') ? href : '/home',
 					routePage = routeName + '.php',
 				// Route params vars
 					urlStructure = $anchor.data('url-structure'),
-					//paramRegExp = /:(\w+)/g,
-					routePageRegExp = /\/:\w+/g,
+					routePageRegExp = /\(\/:\w+\)/g,
 					routeParams = {},
 					routeRegExp = '';
 				
 				// Attach click event on mainmenu links
 				$anchor.click(function(e) {
 					e.preventDefault();
+					var href = $anchor.attr('href');
 					
 					// if same path, do nothing
-					if ($anchor.attr('href') == '/' + getPathname())
+					if (href == getPathname())
 						return false;
 					
 					// else push anchor href
-					history.pushState({'route': routeName}, '', $anchor.attr('href'));
+					history.pushState({'route': routeName}, '', href);
 					router.load();
 				});
 				
-				// Check static/dynamic route type
+				// Check route existance, if true exit
 				if (!urlStructure) {
 					var routeExist = false;
 					$.each(routes, function(routeName, route) {
@@ -128,7 +157,9 @@
 					if (routeExist) return;
 				}
 				
+				// Generate routeRegExp and routeParams
 				if (urlStructure) {
+					routePage = urlStructure.replace(routePageRegExp, '') + '.php';
 					routeRegExp = routeToRegExp(urlStructure);
 					routeParams = extractParametersNames(urlStructure);
 				}
@@ -148,7 +179,7 @@
 		console.log(routes);
 		// URL manager
 		router.replaceAppend = function(url) {
-			history.replaceState(history.state, '', root + history.state.route + '/' + url);
+			history.replaceState(history.state, '', getPathname() + url);
 		};
 		
 		// Page loader
@@ -162,13 +193,13 @@
 			// If not, try to get only the first pathname
 			// e.g. 'tours'
 				var pathNames = getPathname().split('/');
-				currentPath = pathNames[0] || 'home',
+				currentPath = '/' + (pathNames[1] || 'home'),
 				route = routes[currentPath];
 			}
 			// If route still do not exist redirect to 'home' route
 			// e.g. there's no routes['tours']
 			if (route === undefined) {
-				history.pushState({'route': 'home'}, '', root);
+				history.pushState({'route': '/home'}, '', '/');
 				router.load();
 				return false;
 			}
@@ -184,7 +215,7 @@
 			
 			(function() {
 				// Manage .active menu-item
-				var currentPath = getPathname(true),
+				var currentPath = getPathname(),
 					$targetAnchor = $mainMenuAnchors.filter('[href="' + currentPath + '"]');
 				
 				if (!$targetAnchor.length) {
@@ -204,74 +235,38 @@
 					$targetAnchor.parents(settings.menuItemsSelector).addClass('active');
 				
 				// Manage title
-				if (settings.homeAsReset && currentPath == root)
+				if (settings.homeAsReset && currentPath == '/')
 					document.title = siteTitle;
 				else
 					document.title = siteTitle + ' ' + settings.titleSeparator + ' ' + $targetAnchor.text();
 			})();
-			
+			console.log(currentPath);
 			// If homeAsReset call onUnload and exit
-			if (settings.homeAsReset && currentPath == 'home') {
+			if (settings.homeAsReset && currentPath == '/home') {
 				settings.onUnload(currentPath, route);
 				return false;
 			}
 			
 			// Set loading state
-			$targetContainer.addClass('loading');
+			$targetContainer
+				.removeClass('loading')
+				.addClass('loading');
 			
 			// Call onUnload setup function and check response
 			var unloadFunctionResponse = settings.onUnload(currentPath, route) || false;
-			
-			// If a deferred obj is returned, wait for its end
-			// and load requested page
-			if ($.isFunction(unloadFunctionResponse.promise))
-				unloadFunctionResponse.done(function() {
-					$.post(
-						root + settings.pageFolder + route.pageUrl,
-						paramObj,		// Pass to the script other pathNames as argument
-						function(responseText) {
-							// Remove loading state
-							$targetContainer.removeClass('loading');
-							
-							if (settings.loadTarget == null)
-								$targetContainer
-									.html($(responseText))
-									.wrapInner(settings.contentWrap);
-							else
-								$targetContainer
-									.find(settings.loadTarget)
-										.html(responseText)
-										.wrapInner(settings.contentWrap);
-							
-							// Call general setup function
-							settings.onLoad(currentPath, route, this);
-							// Call page's setup function
-							if ($.isFunction(settings.setupFunctions[currentPath]))
-								setTimeout(function() {
-									settings.setupFunctions[currentPath]()
-								}, 0);
-						},
-						'text'
-					);
-				});
-			// Else load requested page w/o waiting
-			else
+			// Create pageRequest function to call it later
+			var pageRequest = function() {
 				$.post(
-					root + settings.pageFolder + route.pageUrl,
-					paramObj,		// Pass to the script other pathNames as argument
-					function(responseText) {
+					pageFolder + route.pageUrl,
+					paramObj,		// Pass to the server script extracted parameters
+					function(requestedPage) {
 						// Remove loading state
 						$targetContainer.removeClass('loading');
 						
-						if (settings.loadTarget == null)
-							$targetContainer
-								.html($(responseText))
-								.wrapInner(settings.contentWrap);
-						else
-							$targetContainer
-								.find(settings.loadTarget)
-									.html(responseText)
-									.wrapInner(settings.contentWrap);
+						// Append retrived content
+						$loadTarget
+							.html($(requestedPage))
+							.wrapInner(settings.contentWrap);
 						
 						// Call general setup function
 						settings.onLoad(currentPath, route, this);
@@ -280,9 +275,59 @@
 							setTimeout(function() {
 								settings.setupFunctions[currentPath]()
 							}, 0);
-					},
-					'text'
+						
+						// Attach click listener to current page links
+						$loadTarget
+							.find('a[href^="/"]')
+							.not('target[_blank]')
+								.on('click', function(e) {
+									e.preventDefault();
+									var $anchor = $(this),
+										href = $anchor.attr('href');
+									
+									// if same path, do nothing
+									if (href == getPathname())
+										return false;
+									
+									// else push anchor href
+									history.pushState({'route': href}, '', href);
+									router.load();
+								});
+						$loadTarget
+							.find('a[href^=#]')
+								.on('click', function(e) {
+									e.preventDefault();
+									router.replaceAppend($(this).attr('href'));
+									settings.onHashChange($(this).attr('href'));
+								});
+						
+						// Submit form via ajax
+						$('form').on('submit', function(e) {
+							e.preventDefault();
+							
+							// Retrieve data
+							var $this = $(this),
+								formID = $this.attr('id'),
+								method = $this.attr('method'),
+								url = settings.ajaxFolder + '/' + formID + '.php',
+								data = JSON.stringify($this.serializeObject());
+							
+							// Make request and call user defined function
+							$[method](url, data, function(response, textStatus, jqXHR) {
+								settings.onFormSubmit(formID, response, textStatus, jqXHR);
+							});
+						});
+					}
 				);
+			};
+			
+			// If a deferred obj is returned, wait for its end
+			// and load requested page
+			if ($.isFunction(unloadFunctionResponse.promise))
+				unloadFunctionResponse.done(pageRequest);
+			// Else load requested page w/o waiting
+			else
+				pageRequest();
 		};
 		// Call loadPage on external page change and once onInit
 		window.onpopstate = router.load;
