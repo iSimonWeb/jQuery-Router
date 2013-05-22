@@ -169,7 +169,7 @@ As you can see on the HTML example above there's a dynamic route
 e.g. if URI would be "/tours/disneyland"
 ```javascript
 {
-	"tourName": 'disnayland'
+	"tourName": 'disneyland'
 }
 ```
 and you could read it on server-side as you always do
