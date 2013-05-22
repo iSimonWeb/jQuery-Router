@@ -30,7 +30,7 @@ This will be your index file.
 		<section id="pearl"></section>
 	</section>
 	
-	<script src="/js/jquery-1.9.1.min.js"></script>
+	<script src="/js/jquery-latest.min.js"></script>
 	<script src="/js/jQuery.Router.js"></script>
 </body>
 ```
