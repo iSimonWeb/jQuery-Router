@@ -4,6 +4,10 @@ jQuery-Router
 The easiest way to setup an AJAX + History API navigation style on your site.
 You just need a main menu in order to make the script understand the main routes of your site.
 
+See demos:
+* Official demo site: http://router.laserdesignstudio.it
+* First site made with this plugin: http://www.spaghettitours.com
+
 Simple setup
 =============
 This will be your index file.
@@ -59,7 +63,6 @@ As it always is, you can pass an object to the constructor to customize your rou
 These are the defaults:
 ```javascript
 {
-	pageFolder: 'pages/',
 	target: '#pearl',
 	loadTarget: null,
 	contentWrap: '',
@@ -77,11 +80,6 @@ These are the defaults:
 Options explaination
 =============
 
-```javascript
-{
-	// The folder that contains all your site's pages
-	pageFolder: 'pages/',
-```
 ```javascript
 	// Main container of your async loaded content
 	// defaults to #pearl 'cause I love the idea of #shell > #pearl
@@ -130,7 +128,7 @@ Options explaination
 	// If a route name matches a function name inside this object,
 	// Router will execute the matched function on page load
 	// e.g. {
-	//			'home': function() {
+	//			'/home': function() {
 	//				console.log('Hell yeah! Home page loaded!');
 	//			}
 	//		}
@@ -138,12 +136,12 @@ Options explaination
 	// Each time the user change route (load another site page)
 	// this function will be executed.
 	// Two parameters are passed:
-	// - 'pathName': is the route the user is navigating to (root address is removed);
-	// 		e.g. 'tours' 		[notice that there's no slash]
+	// - 'pathName': is the route the user is navigating to;
+	// 		e.g. '/tours' 		[notice that there's no slash]
 	// - 'route': is the route object that the Router build from main-menu
 	// 		e.g. {
 	//			regExp: RegExp /^\/tours(?:\/([^\/]+))?$/,
-	//			pageUrl: 'tours.php',
+	//			pageUrl: '/tours.php',
 	//			paramList: ["tour-name"],
 	//			scrollAxis: 'y',
 	//			pageSetup: function(pathName, route) {
@@ -181,6 +179,3 @@ If your route always need a parameter you can setup it with a simple named param
 ```html
 <a href="/profile/iSimonWeb" data-url-structure="/profile/:userName">Tours</a>
 ```
-
-TO BE CONTINUED...
-=============
