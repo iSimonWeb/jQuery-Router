@@ -240,7 +240,7 @@
 				else
 					document.title = siteTitle + ' ' + settings.titleSeparator + ' ' + $targetAnchor.text();
 			})();
-			console.log(currentPath);
+			
 			// If homeAsReset call onUnload and exit
 			if (settings.homeAsReset && currentPath == '/home') {
 				settings.onUnload(currentPath, route);
