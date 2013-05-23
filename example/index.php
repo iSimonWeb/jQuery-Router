@@ -101,7 +101,7 @@
 </head>
 
 <body>
-	<?php include '/pages/menu.php'; ?>
+	<?php include 'pages/menu.php'; ?>
 	<div id="shell" class="wrap">
 		<header><h1>jQuery.Router</h1></header>
 		<div id="pearl">
