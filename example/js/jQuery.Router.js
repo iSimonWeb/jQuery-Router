@@ -42,7 +42,8 @@
 				onUnload: function() {},
 				onLoad: function() {},
 				onHashChange: function() {},
-				onFormSubmit: function() {}
+				onFormSubmit: function() {},
+				debug: false
 			}, options);
 		
 		// Main vars =======================================================================
@@ -176,7 +177,11 @@
 					pageSetup: settings.setupFunctions[routeName] || null
 				};
 			});
-		console.log(routes);
+		
+		// log routes object
+		if (settings.debug)
+			console.log(routes);
+		
 		// URL manager
 		router.replaceAppend = function(url) {
 			history.replaceState(history.state, '', getPathname() + url);
