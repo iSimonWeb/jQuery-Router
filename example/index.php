@@ -69,7 +69,7 @@
 		}
 		// If router recognized a route
 		if ($routeMatch) {
-			// Create empty vars in case of include failuer
+			// Create empty vars in case of include failure
 			$head = '';
 			$body = '';
 			// Request page
