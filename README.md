@@ -163,7 +163,7 @@ As you can see on the HTML example above there's a dynamic route
 ```html
 <a href="/tours" data-url-structure="/tours(/:tourName)">Tours</a>
 ```
-(/:tourName) is an optional parameter, if present on the URI will be passed to the relative .php page script via POST request as a JSON.
+(/:tourName) is an optional parameter, if present on the URI will be passed to the relative .php page script via POST request.
 e.g. if URI would be "/tours/disneyland"
 ```javascript
 {
