@@ -116,13 +116,15 @@
 	<script src="/js/jquery-2.0.0.min.js"></script>
 	<script src="/js/jQuery.Router.js"></script>
 	<script>
-		// Create an instance of the plugin
-		var jQueryRouter = new $.Router({
-			target: 'body',
-			loadTarget: '#pearl',
-			mainMenu: 'nav#main',
-			menuItemsSelector: ''
-		});
+		(function($) {
+			// Create an instance of the plugin
+			var jQueryRouter = new $.Router({
+				target: 'body',
+				loadTarget: '#pearl',
+				mainMenu: 'nav#main',
+				menuItemsSelector: ''
+			});
+		})(jQuery);
 	</script>
 </body>
 </html>
