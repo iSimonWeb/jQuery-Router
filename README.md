@@ -165,7 +165,7 @@ Options explaination
 ```
 
 ```javascript
-	// Set to true if you want to keep track of plugin logs
+	// Set to true if you want to observe plugin logs
 	debug: false
 }
 ```
