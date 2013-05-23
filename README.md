@@ -73,7 +73,10 @@ These are the defaults:
 	homeAsReset: false,
 	setupFunctions: {},
 	onUnload: function() {},
-	onLoad: function() {}
+	onLoad: function() {},
+	onHashChange: function() {},
+	onFormSubmit: function() {},
+	debug: false
 }
 ```
 
@@ -151,7 +154,19 @@ Options explaination
 	// e.g. You may use it to make the 'loadTarget' disappear (opacity: 0)
 	onUnload: function(pathName, route) {},
 	// Same as above, but this one is called on page load
-	onLoad: function() {}
+	onLoad: function(pathName, route) {},
+	// Fired each time hashFragment change
+	onHashChange: function(hashFragment) {},
+	// Fired whenever a form within the loadTarget gets submitted
+	// formID is the "id" attribute of the submitted form
+	// other parameters are get from jQuery async request
+	onFormSubmit: function(formID, response, textStatus, jqXHR) {}
+}
+```
+
+```javascript
+	// Set to true if you want to keep track of plugin logs
+	debug: false
 }
 ```
 
