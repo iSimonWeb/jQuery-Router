@@ -298,6 +298,7 @@
 									history.pushState({'route': href}, '', href);
 									router.load();
 								});
+						// Manage hash change events
 						$loadTarget
 							.find('a[href^=#]')
 								.on('click', function(e) {
@@ -305,6 +306,8 @@
 									router.replaceAppend($(this).attr('href'));
 									settings.onHashChange($(this).attr('href'));
 								});
+						if (location.hash.length)
+							settings.onHashChange(location.hash);
 						
 						// Submit form via ajax
 						$('form').on('submit', function(e) {
