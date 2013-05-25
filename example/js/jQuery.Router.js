@@ -30,7 +30,6 @@
 		// =================================================================================
 		var settings = $.extend({
 				ajaxFolder: '/ajax',
-				target: '#pearl',
 				loadTarget: null,
 				contentWrap: '',
 				titleSeparator: '|',
@@ -54,8 +53,8 @@
 		
 		// Elements cache ==================================================================
 		// =================================================================================
-		var $targetContainer = $(settings.target);
-		var $loadTarget = (settings.loadTarget == null) ? $targetContainer : $targetContainer.find(settings.loadTarget);
+		var $body = $('body');
+		var $loadTarget = $(settings.loadTarget);
 		var $mainMenuAnchors = $(settings.mainMenu + ' ' + settings.menuAnchorsSelector);
 		var $mainMenuItems = (settings.menuItemsSelector == '')
 			? $mainMenuAnchors
@@ -253,7 +252,7 @@
 			}
 			
 			// Set loading state
-			$targetContainer
+			$body
 				.removeClass('loading')
 				.addClass('loading');
 			
@@ -266,7 +265,7 @@
 					paramObj,		// Pass to the server script extracted parameters
 					function(requestedPage) {
 						// Remove loading state
-						$targetContainer.removeClass('loading');
+						$body.removeClass('loading');
 						
 						// Append retrived content
 						$loadTarget
