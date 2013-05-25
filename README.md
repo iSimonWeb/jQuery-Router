@@ -63,7 +63,6 @@ As it always is, you can pass an object to the constructor to customize your rou
 These are the defaults:
 ```javascript
 {
-	target: '#pearl',
 	loadTarget: null,
 	contentWrap: '',
 	titleSeparator: '|',
@@ -84,13 +83,8 @@ Options explaination
 =============
 
 ```javascript
-	// Main container of your async loaded content
-	// defaults to #pearl 'cause I love the idea of #shell > #pearl
-	// BOOBS: (just to have your attention)
-	// during page load the script add the class ".loading" to "target" element 
-	target: '#pearl',
-	// If "target" isn't where you want to put your site's pages content
-	// set "loadTarget" to match a child element of "target"
+	// "loadTarget" is where you want to put your site's pages content
+	// BOOBS: $.Router will add 'loading' class to body element during page load
 	// e.g. '.mCSB_container' in case you're using http://manos.malihu.gr/jquery-custom-content-scroller/
 	loadTarget: null,
 	// Some HTML code to wrap received data with
