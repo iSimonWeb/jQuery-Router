@@ -133,20 +133,6 @@
 					routeParams = {},
 					routeRegExp = '';
 				
-				// Attach click event on mainmenu links
-				$anchor.click(function(e) {
-					e.preventDefault();
-					var href = $anchor.attr('href');
-					
-					// if same path, do nothing
-					if (href == getPathname())
-						return false;
-					
-					// else push anchor href
-					history.pushState({'route': routeName}, '', href);
-					router.load();
-				});
-				
 				// Check route existance, if true exit
 				if (!urlStructure) {
 					var routeExist = false;
@@ -177,9 +163,28 @@
 				};
 			});
 		
+		// Ajaxify all internal anchors
+		$(document).on(
+			'click',
+			'a[href^="/"]:not(target[_blank])',
+			function(e) {
+				e.preventDefault();
+				var $anchor = $(this),
+					href = $anchor.attr('href');
+				
+				// if same path, do nothing
+				if (href == getPathname())
+					return false;
+				
+				// else push anchor href
+				history.pushState({'route': href}, '', href);
+				router.load();
+			}
+		);
+		
 		// log routes object
 		if (settings.debug)
-			console.log(routes);
+			console.log(JSON.stringify(routes));
 		
 		// URL manager
 		router.replaceAppend = function(url) {
@@ -280,23 +285,6 @@
 								settings.setupFunctions[currentPath]()
 							}, 0);
 						
-						// Attach click listener to current page links
-						$loadTarget
-							.find('a[href^="/"]')
-							.not('target[_blank]')
-								.on('click', function(e) {
-									e.preventDefault();
-									var $anchor = $(this),
-										href = $anchor.attr('href');
-									
-									// if same path, do nothing
-									if (href == getPathname())
-										return false;
-									
-									// else push anchor href
-									history.pushState({'route': href}, '', href);
-									router.load();
-								});
 						// Manage hash change events
 						$loadTarget
 							.find('a[href^=#]')
