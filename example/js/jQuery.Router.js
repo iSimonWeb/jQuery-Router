@@ -274,7 +274,7 @@
 						
 						// Append retrived content
 						$loadTarget
-							.html($(requestedPage))
+							.html($.parseHTML(requestedPage))
 							.wrapInner(settings.contentWrap);
 						
 						// Call general setup function
